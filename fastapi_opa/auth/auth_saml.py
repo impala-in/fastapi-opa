@@ -28,7 +28,12 @@ class SAMLAuthentication(AuthInterface):
 
     async def authenticate(
         self, request: Request, *_
-    ) -> Union[RedirectResponse, Dict]:
+    ) -> Union[RedirectResponse, Dict, None]:
+        # If the user has previously been authentified with the SAML SSO flow,
+        # the user is therefore allowed to perform the request, his/her userdata is then returned.
+        if userdata := request.session.get("saml_session"):
+            return json.loads(userdata)
+
         request_args = await self.prepare_request(request)
         auth = await self.init_saml_auth(request_args)
 
@@ -55,7 +60,9 @@ class SAMLAuthentication(AuthInterface):
             logger.debug("--sls--")
             return await self.single_log_out_from_idp(request)
 
-        return await self.single_sign_on(auth)
+        # Default case: we want the request to be unauthorised.
+        # "?sso" should be used to trigger the SAML SSO flow.
+        return None
 
     async def init_saml_auth(self, request_args: Dict) -> OneLogin_Saml2_Auth:
         return OneLogin_Saml2_Auth(
