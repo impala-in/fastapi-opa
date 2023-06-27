@@ -26,6 +26,7 @@ class OPAConfig:
         self,
         authentication: [AuthInterface, List[AuthInterface]],
         opa_host: str,
+        is_opa_disabled: bool = False,
         injectables: Optional[List[Injectable]] = None,
         accepted_methods: Optional[List[str]] = ["id_token", "access_token"],
     ) -> None:
@@ -33,5 +34,6 @@ class OPAConfig:
             authentication = [authentication]
         self.authentication = authentication
         self.opa_url = f"{opa_host.rstrip('/')}/v1/data/httpapi/authz"
+        self.is_opa_disabled = is_opa_disabled
         self.injectables = injectables
         self.accepted_methods = accepted_methods

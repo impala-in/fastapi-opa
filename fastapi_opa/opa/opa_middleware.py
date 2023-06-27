@@ -107,6 +107,12 @@ class OPAMiddleware:
             )
         if not successful:
             return await self.get_unauthorized_response(scope, receive, send)
+
+        # Permission check can be opted-out. It is useful if you do not have an OPA instance setup yet.
+        if self.config.is_opa_disabled:
+            logger.info("Skipping OPA permission check because is_opa_disabled == True")
+            return await self.app(scope, own_receive, send)
+
         # Check OPA decision for info provided in user_info
         # Enrich user_info if injectables are provided
         if self.config.injectables:
