@@ -27,7 +27,7 @@ class SAMLAuthentication(AuthInterface):
         self.custom_folder = Path(self.config.settings_directory)
 
     async def authenticate(
-        self, request: Request
+        self, request: Request, *_
     ) -> Union[RedirectResponse, Dict]:
         request_args = await self.prepare_request(request)
         auth = await self.init_saml_auth(request_args)
